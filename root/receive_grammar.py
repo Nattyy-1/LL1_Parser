@@ -1,14 +1,4 @@
-"""
-Module for receiving grammar input from the user.
-"""
-
 def receive_grammar():
-    """Receives grammar input from the user.
-
-    Returns:
-        list (grammar): A list of strings representing the grammar.
-    """
-    
     number_of_productions = int(input("Enter the number of productions: "))
     grammar = []
 
