@@ -8,6 +8,7 @@ def parse_input(grammar, input_str):
     input_buffer.append('$')
 
     stack = ['$']
+    steps = []
 
     start_symbol = grammar[0].split("->")[0].strip()
     stack.append(start_symbol)
@@ -21,6 +22,14 @@ def parse_input(grammar, input_str):
         top = stack[-1]
 
         if top == look_ahead:
+            steps.append({
+                'stack': stack.copy(),
+                'input': input_buffer.copy(),
+                'lookahead_index': index_ptr,
+                'action': 'match',
+                'production': None
+            })
+            
             stack.pop()
             if top != '$':
                 index_ptr += 1
@@ -30,6 +39,14 @@ def parse_input(grammar, input_str):
             entry = parse_table[top][look_ahead]
 
             if entry is not None:
+                steps.append({
+                    'stack': stack.copy(),
+                    'input': input_buffer.copy(),
+                    'lookahead_index': index_ptr,
+                    'action': 'expand',
+                    'production': entry
+                })
+                
                 lhs, rhs = entry.split("->")
                 lhs = lhs.strip()
                 rhs = rhs.strip()
@@ -51,8 +68,17 @@ def parse_input(grammar, input_str):
                         Node(terminal, parent=parent_node)
 
             else:
-                return None
-    return tree
+                return None, steps
+    
+    steps.append({
+        'stack': stack.copy(),
+        'input': input_buffer.copy(),
+        'lookahead_index': index_ptr,
+        'action': 'match',
+        'production': None
+    })
+    
+    return tree, steps
 
 
 def find_node_in_tree(tree, symbol):
@@ -60,4 +86,3 @@ def find_node_in_tree(tree, symbol):
         if node.name == symbol and not node.children:
             return node
     return None
-
