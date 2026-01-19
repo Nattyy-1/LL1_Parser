@@ -45,7 +45,27 @@ def follow(grammar):
                                     has_changed = True
 
                             if 'e' in FIRST[next_symbol]:
-                                if location + 2 == len(symbols):
+                                k = location + 1
+                                while k < len(symbols):
+                                    sym = symbols[k]
+
+                                    if not sym.isupper():
+                                        if sym not in FOLLOW[left]:
+                                            FOLLOW[left].append(sym)
+                                            has_changed = True
+                                        break
+                                    else:
+                                        for f in FIRST.get(sym, []):
+                                            if f != 'e' and f not in FOLLOW[left]:
+                                                FOLLOW[left].append(f)
+                                                has_changed = True
+
+                                        if 'e' not in FIRST.get(sym, []):
+                                            break
+                                        else:
+                                            k += 1
+
+                                if k >= len(symbols):
                                     for f in FOLLOW[j_left]:
                                         if f not in FOLLOW[left]:
                                             FOLLOW[left].append(f)
@@ -59,4 +79,3 @@ def follow(grammar):
                                     has_changed = True
 
     return FOLLOW
-
